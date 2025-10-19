@@ -1,0 +1,42 @@
+import { IsEmail, IsNotEmpty, IsString, IsStrongPassword, Length, Matches, ValidateIf } from "class-validator";
+import { IsMatch } from "src/common";
+
+export class resendConfirmEmailDto {
+    @IsEmail({}, { message: "Email must be valid" })
+    email: string;
+
+}
+
+export class confirmEmailDto extends resendConfirmEmailDto {
+    @Matches(/^\d{6}$/)
+    code: string;
+
+}
+
+export class LoginBodyDto extends resendConfirmEmailDto {
+
+    @IsNotEmpty({ message: "Password is required" })
+    @IsStrongPassword()
+    password: string;
+
+
+}
+
+export class SignupBodyDto extends LoginBodyDto {
+    @Length(2, 52, { message: 'user min length is 2 char and max length is 6 char' })
+    @IsNotEmpty()
+    @IsString()
+    username: string;
+
+
+    @IsNotEmpty()
+    @IsString()
+    @ValidateIf((data: SignupBodyDto) => {
+        return Boolean(data.password)
+    })
+
+
+    // @Validate(MatchBetweenFields, { message: "confirm password not identical with password" })  //validation option over write defaultMessage
+    @IsMatch(['password'], { message: "confirm password not identical with password" })
+    confirmPassword: string;
+} 

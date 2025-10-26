@@ -1,6 +1,6 @@
 import { Body, Controller, Patch, Post, UsePipes, ValidationPipe } from "@nestjs/common"
 import { AuthenticationService } from "./auth.services";
-import { confirmEmailDto, LoginBodyDto, resendConfirmEmailDto, SignupBodyDto } from "./dto/signup.dto";
+import { confirmEmailDto, IGmailDTO, LoginBodyDto, resendConfirmEmailDto, ResetConfirmPasswordDto, SignupBodyDto, } from "./dto/signup.dto";
 import { LoginResponse } from "./entities/auth.entity";
 
 @Controller('auth')
@@ -15,6 +15,8 @@ export class AuthenticationController {
         forbidNonWhitelisted: true,
     }))
 
+
+
     async signup(
         @Body()
         body: SignupBodyDto  //user class validators
@@ -24,6 +26,8 @@ export class AuthenticationController {
         await this.authenticationService.signup(body);
         return { message: 'Done' }
     }
+
+
 
 
     @Post('resend-confirm-email')
@@ -53,6 +57,8 @@ export class AuthenticationController {
     }
 
 
+
+
     @Post('login')
     async login(
         @Body()
@@ -62,7 +68,50 @@ export class AuthenticationController {
         return { message: 'Done', data: { credentials } }
     }
 
+
+
+
+    @Post('signup/gmail')
+    async signupWithGmail(
+        @Body('idToken')
+        body: IGmailDTO
+    ) {
+
+        return await this.authenticationService.signupWithGmail(body);
+    }
+
+
+
+    @Post('login/gmail')
+    async loginWithGmail(
+        @Body('idToken')
+        body: IGmailDTO
+    ) {
+
+        return await this.authenticationService.loginWithGmail(body);
+    }
+
+
+    @Patch('forget-password')
+    async forgetPassword(
+        @Body('email')
+        body: resendConfirmEmailDto
+    ) {
+        return await this.authenticationService.forgetPassword(body);
+    }
+
+
+    @Patch('reset-confirm-password')
+    async verifyConfirmPassword(
+        @Body()
+        body: ResetConfirmPasswordDto
+    ) {
+        return await this.authenticationService.verifyConfirmPassword(body)
+    }
 }
+
+
+
 
 
 

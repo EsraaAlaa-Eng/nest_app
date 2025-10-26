@@ -1,15 +1,11 @@
 import { MongooseModule, Prop, Schema, SchemaFactory, Virtual } from "@nestjs/mongoose";
-import { HydratedDocument, HydrateOptions } from "mongoose";
+import { HydratedDocument } from "mongoose";
 import { generateHash } from "src/common";
-import { GenderEnum, ProviderEnum, RoleEnum } from "src/common/enums/user.enum";
+import { GenderEnum, languageEnum, ProviderEnum, RoleEnum } from "src/common/enums";
 import { OtpDocument } from "./otp.model";
-import { create } from "domain";
 
 //new Schema ({property },{optional})
 @Schema({ strictQuery: true, timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } })
-
-
-//ts class
 export class User {
 
     //property
@@ -48,7 +44,7 @@ export class User {
     @Prop({
         type: String,
         required: function (this: User) {
-            return this.provider === ProviderEnum.google ? false : true
+            return this.provider === ProviderEnum.GOOGLE ? false : true
         }
     })
     password: string;
@@ -57,7 +53,7 @@ export class User {
     @Prop({
         type: String,
         enum: ProviderEnum,
-        default: ProviderEnum.system,
+        default: ProviderEnum.SYSTEM,
 
     })
     provider: ProviderEnum
@@ -86,11 +82,12 @@ export class User {
     changeCredentialsTime: Date;
 
 
-
-    emailOtp: string;
-    emailOtpExpire: Date;
+    @Prop({ type: Date })
     confirmAt: Date;
-    confirmBy: Date;
+
+    // emailOtp: string;
+    // emailOtpExpire: Date;
+    // confirmBy: Date;
 
 
     @Virtual({
@@ -111,6 +108,16 @@ export class User {
 
     @Virtual()
     otp: OtpDocument[];
+
+
+    @Prop({
+        type: String,
+        enum: languageEnum,
+        default: languageEnum.EN
+    })
+    PreferredLanguage: languageEnum;
+
+
 }
 
 //mongoose schema
@@ -122,7 +129,7 @@ export type UserDocument = HydratedDocument<User>
 userSchema.virtual('otp', {
     localField: "_id",
     foreignField: "createdBy",
-    ref: "otp",
+    ref: "Otp",
 })
 
 //Hooks
@@ -138,3 +145,4 @@ userSchema.pre('save', async function (next) {
 export const UserModel = MongooseModule.forFeature([
     { name: User.name, schema: userSchema }
 ]);
+

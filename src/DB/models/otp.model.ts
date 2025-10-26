@@ -1,9 +1,7 @@
 import { MongooseModule, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument, HydrateOptions, Types } from "mongoose";
-import { promiseAllObject } from "node_modules/zod/v4/core/util.cjs";
+import { HydratedDocument, Types } from "mongoose";
 import { emailEvent, generateHash } from "src/common";
 import { OtpEnum } from "src/common/enums/otp.enum";
-import { date, email } from "zod";
 
 
 
@@ -47,13 +45,13 @@ otpSchema.pre("save", async function (this: OtpDocument & { wasNew: boolean, pla
 })
 
 otpSchema.post("save", async function (doc, next) {
-    const that = await this as OtpDocument & { wasNew: boolean, plainOtp: String }
+    const that = this as OtpDocument & { wasNew: boolean, plainOtp?: String }
 
-    console.log({
-        email: (that.createdBy as any).email,
-        wasNew: that.plainOtp,
-        otp: that.plainOtp,
-    });
+    // console.log({
+    //     email: (that.createdBy as any).email,
+    //     wasNew: that.plainOtp,
+    //     otp: that.plainOtp,
+    // });
 
     if (that.wasNew && that.plainOtp) {
         emailEvent.emit(doc.type,

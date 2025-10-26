@@ -1,8 +1,8 @@
 import { JwtService, JwtSignOptions, JwtVerifyOptions } from "@nestjs/jwt";
-import { JwtPayload,  } from "jsonwebtoken";
-import { RoleEnum, signatureLevelEnum, TokenEnum } from "src/common/enums";
+import { JwtPayload, } from "jsonwebtoken";
+import { RoleEnum, signatureLevelEnum, TokenEnum } from "../enums";
 import { TokenDocument, UserDocument } from "src/DB/models";
-import {  randomUUID } from 'crypto'
+import { randomUUID } from 'crypto'
 import { TokenRepository, UserRepository } from "src/DB";
 import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
 import { parseObjectId } from "../utils";
@@ -105,7 +105,7 @@ export class TokenServices {
 
         const jwtid = randomUUID()
         const access_token = await this.generateToken({
-            payload: { _id: user._id },
+            payload: { sub: user._id },
             options: {
                 secret: signatures.access_signature,
                 expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRES_IN), jwtid
@@ -114,7 +114,7 @@ export class TokenServices {
         });
 
         const refresh_token = await this.generateToken({
-            payload: { _id: user._id },
+            payload: { sub: user._id },
             options: {
                 secret: signatures.refresh_signature,
                 expiresIn: Number(process.env.REFRESH_TOKEN_EXPIRES_IN), jwtid
@@ -151,7 +151,7 @@ export class TokenServices {
                         : signatures.access_signature
                 }
             });
-            if (!decoded?._id || !decoded?.iat) {
+            if (!decoded?.sub || !decoded?.iat) {
                 throw new BadRequestException("Invalid token payload")
             }
 
@@ -175,7 +175,7 @@ export class TokenServices {
 
 
         } catch (error) {
-            throw new InternalServerErrorException(error.massage) || ('something went wrong')
+            throw new InternalServerErrorException(error.message || 'something went wrong')
 
         }
     };

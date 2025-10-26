@@ -4,12 +4,18 @@ export enum GenderEnum {
     female = "female",
 };
 export enum ProviderEnum {
-    google = "GOOGLE",
-    system = "SYSTEM",
+    GOOGLE = "GOOGLE",
+    SYSTEM = "SYSTEM",
 };
 
-export enum RoleEnum{
-    user="user",
-    admin="admin",
-    super_admin="super_admin"
+export enum RoleEnum {
+    user = "user",
+    admin = "admin",
+    super_admin = "super_admin"
+}
+
+export enum languageEnum {
+    AR = "AR",
+    EN = "EN",
+    
 }

@@ -1,21 +1,21 @@
-import { CreateOptions, DeleteResult, FlattenMaps, HydratedDocument, Model, MongooseUpdateQueryOptions, PopulateOption, PopulateOptions, ProjectionType, QueryOptions, RootFilterQuery, Types, UpdateQuery, UpdateWriteOpResult } from "mongoose";
+import { CreateOptions, DeleteResult, FlattenMaps, HydratedDocument, Model, MongooseUpdateQueryOptions, PopulateOptions, ProjectionType, QueryOptions, RootFilterQuery, Types, UpdateQuery, UpdateWriteOpResult } from "mongoose";
 
 export type Lean<T> = FlattenMaps<T>;
 
-export abstract class DatabaseRepository<TRawDocument,TDocument=HydratedDocument<TRawDocument>> {
+export abstract class DatabaseRepository<TRawDocument, TDocument = HydratedDocument<TRawDocument>> {
     constructor(protected model: Model<TDocument>) { }
 
 
-   async create({
+    async create({
         data,
         options,
     }: {
         data: Partial<TRawDocument>[];
         options?: CreateOptions | undefined;
-    }): Promise<TDocument[] > {
+    }): Promise<TDocument[]> {
         return await this.model.create(data, options) || [];
     }
- 
+
 
 
     async findOne({
@@ -29,12 +29,17 @@ export abstract class DatabaseRepository<TRawDocument,TDocument=HydratedDocument
 
     }): Promise<
         // | Lean<TDocument>
-        | HydratedDocument<TDocument>
+        HydratedDocument<TDocument>
         | null
     > {
         const doc = this.model.findOne(filter).select(select || "")
         if (options?.lean) {
             doc.lean(options.lean);
+        }
+
+
+        if (options?.populate) {
+            doc.populate(options.populate as PopulateOptions[]);
         }
         return await doc.exec();
     }
@@ -185,5 +190,20 @@ export abstract class DatabaseRepository<TRawDocument,TDocument=HydratedDocument
         );
     }
 
+
+    async deleteMany({
+        filter,
+
+
+    }:
+        {
+            filter: RootFilterQuery<TRawDocument>,
+
+
+        }): Promise<DeleteResult> {
+        return this.model.deleteMany(
+            filter,
+        );
+    }
 
 }

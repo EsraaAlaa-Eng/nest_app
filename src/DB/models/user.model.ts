@@ -1,12 +1,12 @@
 import { MongooseModule, Prop, Schema, SchemaFactory, Virtual } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
-import { generateHash } from "src/common";
+import { generateHash, IUser } from "src/common";
 import { GenderEnum, languageEnum, ProviderEnum, RoleEnum } from "src/common/enums";
 import { OtpDocument } from "./otp.model";
 
 //new Schema ({property },{optional})
 @Schema({ strictQuery: true, timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } })
-export class User {
+export class User implements IUser {
 
     //property
     @Prop({
@@ -85,9 +85,6 @@ export class User {
     @Prop({ type: Date })
     confirmAt: Date;
 
-    // emailOtp: string;
-    // emailOtpExpire: Date;
-    // confirmBy: Date;
 
 
     @Virtual({
@@ -117,6 +114,9 @@ export class User {
     })
     PreferredLanguage: languageEnum;
 
+    
+    @Prop({ type: String })
+    profilePicture: string
 
 }
 

@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumberString, IsString, IsStrongPassword, Length, Matches, ValidateIf } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, IsStrongPassword, Length, Matches, ValidateIf } from "class-validator";
 import { IsMatch } from "src/common";
 import { extend } from "zod/mini";
 
@@ -10,14 +10,14 @@ export class IGmailDTO {
 
 
 
-export class resendConfirmEmailDto {
+export class ResendConfirmEmailDto {
     @IsEmail({}, { message: "Email must be valid" })
     email: string;
 
 }
 
 
-export class confirmEmailDto extends resendConfirmEmailDto {
+export class confirmEmailDto extends ResendConfirmEmailDto {
     @Matches(/^\d{6}$/)
     code: string;
 
@@ -26,7 +26,7 @@ export class confirmEmailDto extends resendConfirmEmailDto {
 
 
 
-export class LoginBodyDto extends resendConfirmEmailDto {
+export class LoginBodyDto extends ResendConfirmEmailDto {
 
     @IsNotEmpty({ message: "Password is required" })
     @IsStrongPassword()

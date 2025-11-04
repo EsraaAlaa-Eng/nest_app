@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException, 
 import { Types } from "mongoose";
 import { createNumericalOtp, emailEvent, generateHash, IUser, LoginCredentialsResponse, OtpEnum, ProviderEnum } from "src/common";
 import { UserDocument } from "src/DB/models";
-import { confirmEmailDto, IGmailDTO, LoginBodyDto, resendConfirmEmailDto, ResetConfirmPasswordDto, SignupBodyDto } from "./dto/signup.dto";
+import { confirmEmailDto, IGmailDTO, LoginBodyDto, ResendConfirmEmailDto, ResetConfirmPasswordDto, SignupBodyDto } from "./dto/signup.dto";
 import { OtpRepository, UserRepository } from "../../DB/repository";
 import { SecurityService } from "src/common/service/security.service";
 import { TokenServices } from "src/common/service/token.service";
@@ -151,7 +151,7 @@ export class AuthenticationService {
 
 
 
-    async resendConfirmEmail(data: resendConfirmEmailDto): Promise<string> {
+    async resendConfirmEmail(data: ResendConfirmEmailDto): Promise<string> {
         const { email, } = data;
         const user = await this.userRepository.findOne({
             filter: { email, confirmAt: { $exists: false } },
@@ -210,6 +210,7 @@ export class AuthenticationService {
     }
 
 
+
     async login(data: LoginBodyDto): Promise<LoginCredentialsResponse> {
 
         const { email, password } = data;
@@ -231,16 +232,17 @@ export class AuthenticationService {
         if (!(await this.securityService.compareHash(password, user.password))) {
             throw new UnauthorizedException('Invalid email or password');
         }
-
         return await this.tokenService.createLoginCredentials(user as UserDocument)
+
+        
     }
 
 
 
-    async forgetPassword(data: resendConfirmEmailDto) {
+    async forgetPassword(data: ResendConfirmEmailDto) {
         const { email } = data;
 
-        // console.log(data);
+        console.log({ data, email });
 
         const user = await this.userRepository.findOne({
             filter: {
@@ -249,7 +251,7 @@ export class AuthenticationService {
                 confirmAt: { $exists: true }
             }
         });
-        // console.log(" user:", user);
+        console.log(" user:", { user });
 
 
         if (!user) {

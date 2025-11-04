@@ -32,6 +32,9 @@ export abstract class DatabaseRepository<TRawDocument, TDocument = HydratedDocum
         HydratedDocument<TDocument>
         | null
     > {
+
+        console.log({ filter });
+
         const doc = this.model.findOne(filter).select(select || "")
         if (options?.lean) {
             doc.lean(options.lean);
@@ -86,7 +89,16 @@ export abstract class DatabaseRepository<TRawDocument, TDocument = HydratedDocum
         options?: QueryOptions<TDocument> | undefined,
         page?: number | 'all',
         size?: number,
-    }): Promise<TDocument[] | [] | Lean<TDocument>[] | any> {
+    }): Promise<
+        {
+            docsCount?: number,
+            limit?: number,
+            pages?: number,
+            curettagePage: number | undefined,
+            result: TDocument[] | Lean<TDocument>[]
+        }
+
+    > {
         let docsCount: number | undefined = undefined;
         let pages: number | undefined = undefined;
 
@@ -166,9 +178,23 @@ export abstract class DatabaseRepository<TRawDocument, TDocument = HydratedDocum
         options?: QueryOptions<TDocument> | null;
     }): Promise<TDocument | Lean<TDocument> | null> {
         return this.model.findOneAndUpdate(
-            filter,
+            filter || {},
             { ...update, $inc: { __v: 1 } },
             options
+        );
+    }
+
+
+    async findOneAndDelete({
+        filter,
+
+    }: {
+        filter?: RootFilterQuery<TRawDocument>;
+
+    }): Promise<TDocument | Lean<TDocument> | null> {
+        return this.model.findOneAndDelete(
+            filter || {},
+            { $inc: { __v: 1 } },
         );
     }
 

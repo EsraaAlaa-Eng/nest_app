@@ -5,9 +5,10 @@ import { resolve } from 'path';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthenticationModule } from './modules/auth/auth.module';
-import { UserService } from './modules/user/user.services';
 import { UserModule } from './modules/user/user.module';
 import { SharedAuthenticationModule } from './common/modules/auth.module';
+import { S3Service } from './common';
+import { BrandModule } from './modules/brand/brand.module';
 
 @Module({
   imports: [
@@ -27,11 +28,12 @@ import { SharedAuthenticationModule } from './common/modules/auth.module';
     SharedAuthenticationModule,
     AuthenticationModule,
     UserModule,
+    BrandModule
 
 
 
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, S3Service],
 })
 export class AppModule { }

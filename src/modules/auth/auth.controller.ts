@@ -1,7 +1,9 @@
 import { Body, Controller, Patch, Post, UsePipes, ValidationPipe } from "@nestjs/common"
 import { AuthenticationService } from "./auth.services";
-import { confirmEmailDto, IGmailDTO, LoginBodyDto, resendConfirmEmailDto, ResetConfirmPasswordDto, SignupBodyDto, } from "./dto/signup.dto";
+import { confirmEmailDto, IGmailDTO, LoginBodyDto, ResendConfirmEmailDto, ResetConfirmPasswordDto, SignupBodyDto, } from "./dto/signup.dto";
 import { LoginResponse } from "./entities/auth.entity";
+import { IResponse, successResponse } from "src/common";
+import { promises } from "dns";
 
 @Controller('auth')
 export class AuthenticationController {
@@ -9,22 +11,17 @@ export class AuthenticationController {
 
 
     @Post('signup')
-
     @UsePipes(new ValidationPipe({
         whitelist: true,
         forbidNonWhitelisted: true,
     }))
-
-
-
     async signup(
         @Body()
         body: SignupBodyDto  //user class validators
-    ): Promise<{
-        message: string;
-    }> {
+    ): Promise<IResponse> {
         await this.authenticationService.signup(body);
-        return { message: 'Done' }
+        return successResponse();
+
     }
 
 
@@ -33,12 +30,10 @@ export class AuthenticationController {
     @Post('resend-confirm-email')
     async resendConfirmEmail(
         @Body()
-        body: resendConfirmEmailDto  //user class validators
-    ): Promise<{
-        message: string;
-    }> {
+        body: ResendConfirmEmailDto  //user class validators
+    ): Promise<IResponse> {
         await this.authenticationService.resendConfirmEmail(body);
-        return { message: 'Done' }
+        return successResponse()
     }
 
 
@@ -49,11 +44,9 @@ export class AuthenticationController {
     async ConfirmEmail(
         @Body()
         body: confirmEmailDto  //user class validators
-    ): Promise<{
-        message: string;
-    }> {
+    ): Promise<IResponse> {
         await this.authenticationService.confirmEmail(body);
-        return { message: 'Done' }
+        return successResponse()
     }
 
 
@@ -63,9 +56,9 @@ export class AuthenticationController {
     async login(
         @Body()
         body: LoginBodyDto
-    ): Promise<LoginResponse> {
+    ): Promise<IResponse<LoginResponse>> {
         const credentials = await this.authenticationService.login(body);
-        return { message: 'Done', data: { credentials } }
+        return successResponse <LoginResponse>({ data: { credentials } })
     }
 
 
@@ -75,11 +68,11 @@ export class AuthenticationController {
     async signupWithGmail(
         @Body('idToken')
         body: IGmailDTO
-    ) {
+    ): Promise<IResponse> {
+        await this.authenticationService.signupWithGmail(body);
 
-        return await this.authenticationService.signupWithGmail(body);
+        return successResponse()
     }
-
 
 
     @Post('login/gmail')
@@ -94,10 +87,14 @@ export class AuthenticationController {
 
     @Patch('forget-password')
     async forgetPassword(
-        @Body('email')
-        body: resendConfirmEmailDto
-    ) {
-        return await this.authenticationService.forgetPassword(body);
+        @Body()
+        // @Body('email')
+
+        body: ResendConfirmEmailDto
+    ): Promise<IResponse> {
+
+        await this.authenticationService.forgetPassword(body);
+        return successResponse()
     }
 
 
@@ -105,8 +102,10 @@ export class AuthenticationController {
     async verifyConfirmPassword(
         @Body()
         body: ResetConfirmPasswordDto
-    ) {
-        return await this.authenticationService.verifyConfirmPassword(body)
+    ): Promise<IResponse> {
+        await this.authenticationService.verifyConfirmPassword(body)
+        return successResponse()
+
     }
 }
 

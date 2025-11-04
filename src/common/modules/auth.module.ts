@@ -1,39 +1,43 @@
 import { Module } from "@nestjs/common";
 import { otpModel, tokenModel, UserModel } from "src/DB/models";
-import { OtpRepository, TokenRepository, UserRepository } from "src/DB";
-import { SecurityService } from "src/common/service/security.service";
+import { TokenRepository, UserRepository } from "src/DB";
 import { JwtService } from "@nestjs/jwt";
 import { TokenServices } from "src/common/service/token.service";
-import { AuthenticationService } from "src/modules/auth/auth.services";
-import { AuthenticationController } from "src/modules/auth/auth.controller";
-import { AuthenticationGuard } from "../guards/authentication/authentication.guard";
 
 // لو الملف مش موجود،
 //  Nestال
 //  مش هيعرف الكنترولر وبالتالي مش هيعمل 
 // route /auth/signup.
 @Module({
-    imports: [UserModel, otpModel, tokenModel],
-    // controllers: [AuthenticationController],
+    imports: [
+        UserModel,
+        otpModel,
+        tokenModel],
+
     providers: [
-        AuthenticationService,
-        UserRepository,
-        OtpRepository,
-        SecurityService,
+        // AuthenticationService,
+        // OtpRepository,
+        // SecurityService,
+        // AuthenticationGuard
+
+
         TokenServices,
-        JwtService,
         TokenRepository,
-        AuthenticationGuard
+        UserRepository,
+        JwtService,
+
     ], //services ,factors,
+
     exports: [
-        AuthenticationService,
-        UserRepository,
         TokenServices,
-        JwtService,
         TokenRepository,
+        UserRepository,
         tokenModel,
         UserModel,
-        AuthenticationGuard,
+        JwtService,
+
+        // AuthenticationService,
+        // AuthenticationGuard,
     ],
 })
 export class SharedAuthenticationModule { }

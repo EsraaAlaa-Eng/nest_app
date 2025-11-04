@@ -185,7 +185,7 @@ export class TokenServices {
         const [result] = (await this.tokenRepository.create({
             data: [{
                 jti: decoded.jti as string,
-                expireAt: new Date(
+                expiredAt: new Date(
                     (decoded.iat as number) +
                     Number(process.env.REFRESH_TOKEN_EXPIRES_IN)),
 

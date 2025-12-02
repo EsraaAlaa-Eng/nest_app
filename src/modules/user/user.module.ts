@@ -3,13 +3,14 @@ import { UserController } from "./user.controller";
 import { PreAuth } from "src/common/middleware/authentication.middleware";
 import { UserService } from "./user.services";
 import { SharedAuthenticationModule } from "src/common/modules/auth.module";
-import { UserRepository } from "src/DB";
+import { ProductModel, UserRepository } from "src/DB";
 import { MulterModule } from "@nestjs/platform-express";
 import { S3Service } from "src/common";
+import { ProductRepository } from "src/DB/repository/product.repository";
 
 
 @Module({
-    imports: [SharedAuthenticationModule,
+    imports: [SharedAuthenticationModule, ProductModel,
         MulterModule.register({
             // storage: diskStorage({
             //     destination(
@@ -34,7 +35,7 @@ import { S3Service } from "src/common";
         })
     ],
     controllers: [UserController],
-    providers: [UserService, UserRepository,S3Service],
+    providers: [UserService, UserRepository, S3Service, ProductRepository],
     exports: [],
 })
 export class UserModule {

@@ -1,20 +1,25 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { url } from "inspector";
 import { S3Service, StorageEnum } from "src/common";
-import { UserDocument, UserRepository } from "src/DB";
+import { Lean, ProductDocument, UserDocument, UserRepository } from "src/DB";
+import { ProductParamsDto } from "../product/dto/update-product.dto";
+import { Types } from "mongoose";
+import { ProductRepository } from "src/DB/repository/product.repository";
 
 @Injectable()
 export class UserService {
 
     constructor(
         private readonly userRepository: UserRepository,
+        private readonly productRepository: ProductRepository,
+
         private readonly s3Service: S3Service
     ) { }
 
     async Profile(data: any): Promise<string> {
 
         console.log(data);
-        return `Done`
+        return data
     }
 
     async ProfileImage(
@@ -33,5 +38,7 @@ export class UserService {
 
     }
 
+
+ 
 
 }

@@ -1,15 +1,15 @@
-import { Controller, Get, Headers, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Req, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Controller, Get, Headers, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Post, Req, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.services";
 import * as common from "src/common";
 import { Auth } from "src/common/decorators/auth.decorators";
-import type { UserDocument } from "src/DB";
+import type { Product, UserDocument } from "src/DB";
 import { PreferredLanguageInterceptor } from "src/common/interceptors";
 import { delay, Observable, of } from "rxjs";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { cloudFileUpload, fileValidation, localFileUpload } from "src/common/utils/multer";
-import { IResponse, IUser, RoleEnum, StorageEnum, successResponse, User, type IMulterFile } from "src/common";
-import { promises } from "dns";
+import { cloudFileUpload, fileValidation } from "src/common/utils/multer";
+import { IResponse, RoleEnum, StorageEnum, successResponse, User } from "src/common";
 import { profileResponse } from "./entity/user.entity";
+import { ProductParamsDto } from "../product/dto/update-product.dto";
 
 
 
@@ -20,13 +20,39 @@ export class UserController {
     private readonly userService: UserService
   ) { }
 
+
+  @Auth([RoleEnum.admin, RoleEnum.super_admin, RoleEnum.user])
+  @Get()
+  async profile(
+    @User() user: UserDocument,
+
+  ):Promise<IResponse<profileResponse>> {
+    await user.populate([{ path: "wishList" }])
+    return successResponse<profileResponse>({ data: { profile:user } })
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   @UseInterceptors(PreferredLanguageInterceptor)
   @Auth([common.RoleEnum.admin, common.RoleEnum.user])
   @Get('profile')
   Profile(
     @Headers() header: any,
-    @common.User()
-    user: UserDocument
+    @common.User() user: UserDocument
   ):
     Observable<any> {
     console.log({
@@ -34,7 +60,7 @@ export class UserController {
       user
     });
 
-    return of([{ message: 'Done' }]).pipe(delay(200))
+    return of([{ message: 'Done', user }]).pipe(delay(200))
   }
 
   @UseInterceptors(
@@ -62,6 +88,9 @@ export class UserController {
     const profile = await this.userService.ProfileImage(file, user)
     return successResponse<profileResponse>({ data: { profile } })
   }
+
+
+
 
 
 

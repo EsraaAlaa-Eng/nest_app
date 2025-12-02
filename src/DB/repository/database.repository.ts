@@ -139,6 +139,14 @@ export abstract class DatabaseRepository<TRawDocument, TDocument = HydratedDocum
             | null
 
         }): Promise<UpdateWriteOpResult> {
+        if (Array.isArray(update)) {
+            update.push({
+                $set: {
+                    __v: { $add: [`$__v`, 1] }
+                },
+            });
+            return await this.model.updateOne(filter || {}, update, options)
+        }
         return this.model.updateOne(
             filter,
             { ...update, $inc: { __v: 1 } },
@@ -173,15 +181,35 @@ export abstract class DatabaseRepository<TRawDocument, TDocument = HydratedDocum
 
 
     }: {
-        filter?: RootFilterQuery<TRawDocument>;
-        update?: UpdateQuery<TDocument> | null;
+        filter?: RootFilterQuery<TDocument>;
+        update?: UpdateQuery<TDocument>;
         options?: QueryOptions<TDocument> | null;
     }): Promise<TDocument | Lean<TDocument> | null> {
-        return this.model.findOneAndUpdate(
+
+
+        if (Array.isArray(update)) {
+            update.push({
+                $set: {
+                    __v: { $add: [`$__v`, 1] }
+                },
+            });
+            return await this.model.findOneAndUpdate(filter || {}, update, options)
+        }
+        let doc = this.model.findOneAndUpdate(
             filter || {},
             { ...update, $inc: { __v: 1 } },
-            options
+            options,
         );
+
+        if (options?.populate) {
+            doc = doc.populate(options.populate as PopulateOptions[]);
+        }
+
+        if (options?.lean) {
+            doc.lean(options.lean);
+        }
+
+        return await doc.exec()
     }
 
 

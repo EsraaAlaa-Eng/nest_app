@@ -1,4 +1,3 @@
-import { OtpDocument } from "src/DB";
 import { OtpEnum, RoleEnum } from "../enums";
 import { Types } from "mongoose";
 import { IUser } from "./user.interfaces";

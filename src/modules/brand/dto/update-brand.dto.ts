@@ -15,21 +15,3 @@ export class BrandParamsDto {
 }
 
 
-export class GetAllDto {
-    @Type(() => Number) // type correction  "2" => 2
-    @IsNumber()
-    @IsPositive()
-    @IsOptional()
-    page: number;
-
-    @Type(() => Number)
-    @IsPositive()
-    @IsNumber()
-    @IsPositive()
-    size: number;
-
-    @IsNotEmpty()
-    @IsString()
-    @IsOptional()
-    search: string;
-}

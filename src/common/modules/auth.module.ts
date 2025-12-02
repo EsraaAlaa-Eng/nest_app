@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Global, Module } from "@nestjs/common";
 import { otpModel, tokenModel, UserModel } from "src/DB/models";
 import { TokenRepository, UserRepository } from "src/DB";
 import { JwtService } from "@nestjs/jwt";
@@ -8,20 +8,17 @@ import { TokenServices } from "src/common/service/token.service";
 //  Nestال
 //  مش هيعرف الكنترولر وبالتالي مش هيعمل 
 // route /auth/signup.
+@Global()
 @Module({
     imports: [
         UserModel,
-        otpModel,
-        tokenModel],
+        // otpModel,
+        tokenModel
+    ],
 
     providers: [
-        // AuthenticationService,
-        // OtpRepository,
-        // SecurityService,
-        // AuthenticationGuard
-
-
-        TokenServices,
+     
+       TokenServices,
         TokenRepository,
         UserRepository,
         JwtService,
@@ -36,8 +33,7 @@ import { TokenServices } from "src/common/service/token.service";
         UserModel,
         JwtService,
 
-        // AuthenticationService,
-        // AuthenticationGuard,
+    
     ],
 })
 export class SharedAuthenticationModule { }

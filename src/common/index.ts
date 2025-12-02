@@ -5,3 +5,7 @@ export * from './pipe'
 export * from './utils'
 export * from './entities'
 export * from './service'
+export * from './service'
+// export * from './modules'  
+export * from './dtos'
+

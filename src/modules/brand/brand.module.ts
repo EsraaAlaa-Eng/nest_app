@@ -8,7 +8,7 @@ import { SharedAuthenticationModule } from 'src/common/modules/auth.module';
 @Module({
   imports: [
     BrandModel, 
-    SharedAuthenticationModule
+    
   ],
   controllers: [BrandController],
   providers: [BrandService, BrandRepository, S3Service],

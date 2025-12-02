@@ -8,6 +8,7 @@ import { BadRequestException, Injectable, InternalServerErrorException, Unauthor
 import { parseObjectId } from "../utils";
 import { LoginCredentialsResponse } from "../entities";
 
+
 @Injectable()
 export class TokenServices {
 
@@ -36,6 +37,7 @@ export class TokenServices {
 
     };
 
+
     verifyToken = async ({
         token,
         options = {
@@ -51,7 +53,6 @@ export class TokenServices {
 
 
     };
-
 
 
 

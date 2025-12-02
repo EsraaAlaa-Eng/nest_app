@@ -9,6 +9,11 @@ import { UserModule } from './modules/user/user.module';
 import { SharedAuthenticationModule } from './common/modules/auth.module';
 import { S3Service } from './common';
 import { BrandModule } from './modules/brand/brand.module';
+import { Category } from './DB';
+import { CategoryModule } from './modules/category/category.module';
+import { ProductModule } from './modules/product/product.module';
+import { CartModule } from './modules/cart/cart.module';
+import { CouponModule } from './modules/coupon/coupon.module';
 
 @Module({
   imports: [
@@ -18,7 +23,6 @@ import { BrandModule } from './modules/brand/brand.module';
     MongooseModule.forRoot(process.env.DB_URL as string,
       {
         serverSelectionTimeoutMS: 30000,
-        // dbName: 'NEST_APP',
       }),
 
     //ال NestJS
@@ -28,12 +32,18 @@ import { BrandModule } from './modules/brand/brand.module';
     SharedAuthenticationModule,
     AuthenticationModule,
     UserModule,
-    BrandModule
+    BrandModule,
+    CategoryModule,
+    ProductModule,
+    CartModule,
+    CouponModule,
 
 
 
   ],
   controllers: [AppController],
-  providers: [AppService, S3Service],
+  providers: [AppService, S3Service,
+
+  ],
 })
 export class AppModule { }

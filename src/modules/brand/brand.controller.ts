@@ -15,14 +15,14 @@ import {
 } from '@nestjs/common';
 import { BrandService } from './brand.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
-import { IBrand, IResponse, successResponse, User } from 'src/common';
-import { Brand, BrandDocument, type UserDocument } from 'src/DB';
-import { BrandResponse, GetAllResponse } from './entities/brand.entity';
-import { endpoint } from './authorization.module';
+import { GetAllDto, GetAllResponse, IBrand, IResponse, successResponse, User } from 'src/common';
+import { type UserDocument } from 'src/DB';
+import { BrandResponse } from './entities/brand.entity';
+import { endpoint } from './brand.authorization';
 import { Auth } from 'src/common/decorators/auth.decorators';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { cloudFileUpload, fileValidation } from 'src/common/utils/multer';
-import { BrandParamsDto, GetAllDto, UpdateBrandDto } from './dto/update-brand.dto';
+import { BrandParamsDto, UpdateBrandDto } from './dto/update-brand.dto';
 
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
@@ -38,7 +38,7 @@ export class BrandController {
       cloudFileUpload({ validation: fileValidation.image })
     )
   )
-  @Auth(endpoint.CreateBrand)
+  @Auth(endpoint.Create)
   @Post()
   async create(
     @User() user: UserDocument,   // to get info about user login
@@ -51,7 +51,7 @@ export class BrandController {
   }
 
 
-  @Auth(endpoint.CreateBrand)
+  @Auth(endpoint.Create)
   @Patch(':brandId')
   async updateBrand(
     @Param() params: BrandParamsDto,
@@ -70,7 +70,7 @@ export class BrandController {
       cloudFileUpload({ validation: fileValidation.image })
     )
   )
-  @Auth(endpoint.CreateBrand)
+  @Auth(endpoint.Create)
   @Patch(':brandId/attachment')
   async updateAttachment(
     @Param() params: BrandParamsDto,
@@ -84,7 +84,7 @@ export class BrandController {
   }
 
 
-  @Auth(endpoint.CreateBrand)
+  @Auth(endpoint.Create)
   @Delete(':brandId/freeze')
   async freezedBrand(
     @Param() params: BrandParamsDto,
@@ -96,7 +96,7 @@ export class BrandController {
   }
 
 
-  @Auth(endpoint.CreateBrand)
+  @Auth(endpoint.Create)
   @Patch(':brandId/restore')
   async restoreBrand(
     @Param() params: BrandParamsDto,
@@ -111,7 +111,7 @@ export class BrandController {
 
 
   //HD
-  @Auth(endpoint.CreateBrand)
+  @Auth(endpoint.Create)
   @Delete(':brandId')
   async removeBrand(
     @User() user: UserDocument,
@@ -127,33 +127,45 @@ export class BrandController {
 
 
 
-
-
-
   @Get()
   async findAllBrand(
     @Query() query: GetAllDto
-  ) {
+  ): Promise<IResponse<GetAllResponse<IBrand>>> {
     const result = await this.brandService.findAllBrand(query);
-    return successResponse<GetAllResponse>({ data: { result } })
+    return successResponse<GetAllResponse<IBrand>>({ data: { result } })
 
 
   }
 
-  @Auth(endpoint.CreateBrand)
+  @Auth(endpoint.Create)
   @Get('/archive')
   async findAllArchives(
     @Query() query: GetAllDto
-  ) {
-    const result = await this.brandService.findAllBrand(query);
-    return successResponse<GetAllResponse>({ data: { result } })
+  ): Promise<IResponse<GetAllResponse<IBrand>>> {
+    const result = await this.brandService.findAllBrand(query, true);
+    return successResponse<GetAllResponse<IBrand>>({ data: { result } })
 
 
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.brandService.findOne(+id);
+
+
+
+  @Get(':brandId')
+  async findOne(
+    @Param() params: BrandParamsDto) {
+    const brand = await this.brandService.findOne(params.brandId);
+    return successResponse<BrandResponse>({ data: { brand } })
+
+  }
+
+  @Auth(endpoint.Create)
+  @Get(':brandId/archive')
+  async findOneArchive(
+    @Param() params: BrandParamsDto) {
+    const brand = await this.brandService.findOne(params.brandId, true);
+    return successResponse<BrandResponse>({ data: { brand } })
+
   }
 
 

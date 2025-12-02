@@ -2,8 +2,8 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException }
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { BrandDocument, BrandRepository } from 'src/DB';
 import type { Lean, UserDocument } from 'src/DB';
-import { FolderEnum, S3Service } from 'src/common';
-import { BrandParamsDto, GetAllDto, UpdateBrandDto } from './dto/update-brand.dto';
+import { FolderEnum, GetAllDto, S3Service } from 'src/common';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 import { Types } from 'mongoose';
 
 // import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -35,6 +35,20 @@ export class BrandService {
         : "Duplicated brand name",
       )
     }
+    const checkDuplicateSlogan = await this.brandRepository.findOne({
+      filter: {
+        slogan,
+        paranoId: false
+      }
+    })
+    if (checkDuplicateSlogan) {
+      throw new ConflictException(
+        checkDuplicateSlogan.freezedAt
+          ? 'Duplicated with archived brand'
+          : 'Duplicated Slogan name'
+      )
+    }
+
     const image: string = await this.s3Service.uploadFile({
       file,
       path: `Brand`
@@ -182,7 +196,11 @@ export class BrandService {
     user: UserDocument
   ): Promise<string> {
     const brand = await this.brandRepository.findOneAndDelete({
-      filter: { _id: brandId, paranoId: false, freezedAt: { $exists: true } },
+      filter: {
+        _id: brandId,
+        paranoId: false,
+        freezedAt: { $exists: true }
+      },
     })
     if (!brand) {
       throw new NotFoundException('fail to fiend matching brand instance ')
@@ -191,18 +209,6 @@ export class BrandService {
     await this.s3Service.deleteFile({ Key: brand.image })
     return `Done`
   }
-
-
-
-
-
-
-
-
-
-
-
-
 
   async findAllBrand(
     data: GetAllDto,
@@ -239,17 +245,21 @@ export class BrandService {
 
 
 
+  async findOne(
+    brandId: Types.ObjectId,
+    archive: boolean = false
+  ) {
+    const brand = await this.brandRepository.findOne({
+      filter: {
+        _id: brandId,
 
-
-
-
-
-
-  findOne(id: number) {
-    return `This action returns a #${id} brand`;
+        ...(archive ? { paranoId: false, freezedAt: { $exists: true } } : {})
+      }
+    })
+    if (!brand) {
+      throw new NotFoundException('Fail to find matching brand instance ')
+    }
+    return brand
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} brand`;
-  }
 }
